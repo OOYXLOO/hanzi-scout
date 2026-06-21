@@ -57,9 +57,12 @@ if (!adapter.includes("createRewardedVideoAd")) failures.push("wechat adapter mi
 if (!adapter.includes("createInterstitialAd")) failures.push("wechat adapter missing interstitial hook");
 
 const html = await readFile(join(root, "index.html"), "utf8");
-for (const id of ["hint-button", "time-button", "share-button", "glyph-grid", "goal-line", "profile-line", "result-card"]) {
+for (const id of ["hint-button", "time-button", "share-button", "glyph-grid", "goal-line", "profile-line", "result-card", "leaderboard-list"]) {
   if (!html.includes(id)) failures.push(`index.html missing ${id}`);
 }
+
+const profile = await readFile(join(root, "src/profile.js"), "utf8");
+if (!profile.includes("createFriendLeaderboard")) failures.push("profile missing friend leaderboard generator");
 
 for (const file of await walk(root)) {
   if (!checkedExtensions.has(extname(file))) continue;

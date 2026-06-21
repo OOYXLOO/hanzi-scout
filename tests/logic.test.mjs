@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, startRun, tapCell } from "../src/game.js";
 import { createDailyGoal, createRound, createRun, quadrantForIndex } from "../src/levels.js";
-import { createScoreCard, loadProfile, recordRun, saveProfile } from "../src/profile.js";
+import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "../src/profile.js";
 import { createPlatformAdapter } from "../src/wechat-adapter.js";
 
 let time = Date.parse("2026-06-21T00:00:00.000Z");
@@ -58,6 +58,14 @@ assert.equal(profile.bestScore, summary.score);
 assert.equal(saveProfile(profile, { storage }), true);
 assert.equal(loadProfile({ storage }).bestScore, summary.score);
 assert.match(createScoreCard(profile, summary).record, /Best/);
+const leaderboard = createFriendLeaderboard(profile, summary);
+assert.equal(leaderboard.length, 5);
+assert.equal(leaderboard.filter((entry) => entry.isPlayer).length, 1);
+assert.ok(leaderboard.every((entry, index) => entry.rank === index + 1));
+assert.deepEqual(
+  createFriendLeaderboard(profile, summary).map((entry) => entry.score),
+  leaderboard.map((entry) => entry.score),
+);
 
 const round = createRound({ dayKey: "2026-06-21", index: 3 });
 assert.equal(round.cells.length, 36);

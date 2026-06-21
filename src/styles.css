@@ -240,6 +240,49 @@ h1 {
   background: var(--jade-soft);
 }
 
+.leaderboard-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.leaderboard-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #fffdf8;
+}
+
+.leaderboard-list li.player {
+  border-color: rgba(22, 116, 95, 0.45);
+  background: var(--jade-soft);
+}
+
+.leaderboard-list span {
+  overflow: hidden;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderboard-list strong {
+  color: var(--night);
+  font-variant-numeric: tabular-nums;
+}
+
+.leaderboard-list em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+}
+
 textarea {
   width: 100%;
   min-height: 96px;

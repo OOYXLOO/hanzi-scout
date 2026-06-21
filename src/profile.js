@@ -85,6 +85,36 @@ export function createScoreCard(profile, summary) {
   };
 }
 
+export function createFriendLeaderboard(profile, summary, { names = ["小林", "Mia", "阿澈", "Noah"] } = {}) {
+  const next = normalizeProfile(profile);
+  const dayKey = summary?.dayKey || next.lastPlayedDay || next.bestDay || "daily";
+  const playerScore = Number(summary?.score || dailyHistory(next, dayKey)?.score || next.bestScore || 0);
+  const playerSolved = Number(summary?.solved || dailyHistory(next, dayKey)?.solved || next.bestSolved || 0);
+  const entries = names.map((name, index) => {
+    const seed = hash(`${dayKey}:${name}:${index}`);
+    const solved = Math.min(6, 3 + (seed % 4));
+    const score = 420 + (seed % 360) + solved * 38 + index * 11;
+    return {
+      name,
+      score,
+      solved,
+      isPlayer: false,
+    };
+  });
+
+  entries.push({
+    name: "你",
+    score: playerScore,
+    solved: playerSolved,
+    isPlayer: true,
+  });
+
+  return entries
+    .sort((a, b) => b.score - a.score || b.solved - a.solved || a.name.localeCompare(b.name))
+    .slice(0, 5)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+}
+
 function compactSummary(summary) {
   return {
     dayKey: summary.dayKey,
@@ -95,6 +125,10 @@ function compactSummary(summary) {
     misses: summary.misses,
     goalMet: summary.goalMet,
   };
+}
+
+function dailyHistory(profile, dayKey) {
+  return profile.history.find((entry) => entry.dayKey === dayKey) || null;
 }
 
 function normalizeProfile(value) {
@@ -109,6 +143,15 @@ function normalizeProfile(value) {
   profile.completions = Number.isFinite(profile.completions) ? profile.completions : 0;
   profile.totalScore = Number.isFinite(profile.totalScore) ? profile.totalScore : 0;
   return profile;
+}
+
+function hash(input) {
+  let value = 2166136261;
+  for (const char of String(input)) {
+    value ^= char.codePointAt(0);
+    value = Math.imul(value, 16777619);
+  }
+  return value >>> 0;
 }
 
 function isNextDay(previousDay, currentDay) {

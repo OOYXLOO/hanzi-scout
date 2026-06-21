@@ -1,6 +1,6 @@
 import { canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, startRun, tapCell } from "./game.js";
 import { getDayKey } from "./levels.js";
-import { createScoreCard, loadProfile, recordRun, saveProfile } from "./profile.js";
+import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "./profile.js";
 import { createPlatformAdapter } from "./wechat-adapter.js";
 
 const refs = {
@@ -23,6 +23,7 @@ const refs = {
   goal: document.querySelector("#goal-line"),
   profile: document.querySelector("#profile-line"),
   resultCard: document.querySelector("#result-card"),
+  leaderboard: document.querySelector("#leaderboard-list"),
 };
 
 const platform = createPlatformAdapter();
@@ -116,6 +117,7 @@ function render() {
   refs.goal.textContent = formatGoal();
   refs.profile.textContent = formatProfile();
   refs.assist.textContent = formatAssist();
+  renderLeaderboard(createRunSummary(state));
   refs.hint.disabled = !state.startedAt || state.complete || !canUseReward(state, "hint");
   refs.timeButton.disabled = !state.startedAt || state.complete || !canUseReward(state, "extraTime");
   renderProgress();
@@ -152,6 +154,17 @@ function render() {
         render();
       });
       return button;
+    }),
+  );
+}
+
+function renderLeaderboard(summary) {
+  refs.leaderboard.replaceChildren(
+    ...createFriendLeaderboard(profile, summary).map((entry) => {
+      const li = document.createElement("li");
+      li.className = entry.isPlayer ? "player" : "";
+      li.innerHTML = `<span>${entry.rank}. ${entry.name}</span><strong>${entry.score}</strong><em>${entry.solved}/6</em>`;
+      return li;
     }),
   );
 }

@@ -74,6 +74,7 @@ h1 {
 }
 
 .play-zone {
+  width: 100%;
   min-width: 0;
   display: grid;
   align-content: start;
@@ -141,8 +142,8 @@ h1 {
 
 .glyph-grid {
   --grid-size: 6;
-  width: min(86vh, 720px);
-  max-width: 100%;
+  width: 100%;
+  max-width: min(86vh, 720px);
   aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));

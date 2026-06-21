@@ -5,6 +5,8 @@ const root = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "
 const required = [
   "README.md",
   "index.html",
+  "docs/media/mobile-start.png",
+  "docs/media/mobile-complete.png",
   "src/levels.js",
   "src/game.js",
   "src/profile.js",
@@ -49,6 +51,20 @@ for (const file of required) {
     if (!info.isFile()) failures.push(`required file missing: ${file}`);
   } catch {
     failures.push(`required file missing: ${file}`);
+  }
+}
+
+for (const image of ["docs/media/mobile-start.png", "docs/media/mobile-complete.png"]) {
+  const bytes = await readFile(join(root, image));
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (Buffer.compare(bytes.subarray(0, 8), signature) !== 0) {
+    failures.push(`${image} is not a PNG`);
+    continue;
+  }
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  if (width !== 780 || height !== 1688) {
+    failures.push(`${image} dimensions should be 780x1688, got ${width}x${height}`);
   }
 }
 

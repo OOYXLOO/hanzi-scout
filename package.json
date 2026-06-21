@@ -1,0 +1,19 @@
+{
+  "name": "hanzi-scout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A lightweight glyph-spotting puzzle prototype designed for quick mobile sessions.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node tests/logic.test.mjs",
+    "check": "node --check src/levels.js && node --check src/game.js && node --check src/profile.js && node --check src/wechat-adapter.js && node --check src/main.js && node --check scripts/audit-local.mjs && node --check scripts/serve.mjs && node --check tests/logic.test.mjs",
+    "audit:local": "node scripts/audit-local.mjs"
+  },
+  "keywords": [
+    "wechat-minigame",
+    "glyph-puzzle",
+    "daily-game"
+  ],
+  "license": "UNLICENSED"
+}

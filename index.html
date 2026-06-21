@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hanzi Scout</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="play-zone" aria-label="Hanzi Scout game">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">每日汉字挑战</p>
+            <h1>Hanzi Scout</h1>
+          </div>
+          <div class="meter" aria-label="Timer">
+            <span>剩余</span>
+            <strong id="time-value">60</strong>
+          </div>
+        </div>
+
+        <section class="mission-strip" aria-label="Current mission">
+          <div>
+            <span>找出</span>
+            <strong id="target-value">未</strong>
+          </div>
+          <div>
+            <span>混在</span>
+            <strong id="decoy-value">末</strong>
+          </div>
+          <div>
+            <span>轮次</span>
+            <strong id="round-value">1/6</strong>
+          </div>
+        </section>
+
+        <div id="grid" class="glyph-grid" aria-label="Tap the different glyph"></div>
+      </section>
+
+      <aside class="hud" aria-label="Run details">
+        <section class="panel score-panel">
+          <p class="eyebrow">本局</p>
+          <div class="score-row">
+            <div>
+              <span>分数</span>
+              <strong id="score-value">0</strong>
+            </div>
+            <div>
+              <span>连击</span>
+              <strong id="combo-value">x1</strong>
+            </div>
+          </div>
+          <p id="status-line" class="status-line">准备好后开始。</p>
+          <button id="start-button" type="button">开始挑战</button>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">激励帮助</p>
+          <div class="button-grid">
+            <button id="hint-button" class="secondary" type="button">看提示</button>
+            <button id="time-button" class="secondary" type="button">加 10 秒</button>
+          </div>
+          <p id="assist-line" class="microcopy">每局最多 2 次提示、1 次加时。浏览器模式只模拟完成。</p>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">进度</p>
+          <ol id="progress-list" class="progress-list" aria-label="Round progress"></ol>
+          <button id="share-button" class="wide secondary" type="button">分享成绩</button>
+          <textarea id="share-text" readonly aria-label="Share text"></textarea>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">今日目标</p>
+          <p id="daily-line" class="daily-line"></p>
+          <p id="goal-line" class="microcopy"></p>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">记录</p>
+          <p id="profile-line" class="daily-line"></p>
+          <p id="result-card" class="microcopy"></p>
+        </section>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

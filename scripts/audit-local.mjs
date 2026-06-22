@@ -5,6 +5,8 @@ const root = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "
 const required = [
   "README.md",
   "index.html",
+  "game.js",
+  "game.json",
   "docs/media/mobile-start.png",
   "docs/media/mobile-complete.png",
   "src/levels.js",
@@ -16,6 +18,7 @@ const required = [
   "src/styles.css",
   "tests/logic.test.mjs",
   "tests/canvasShell.test.mjs",
+  "tests/wechatEntry.test.mjs",
   "tests/wechatPackageAudit.test.mjs",
   "docs/wechat-port-plan.md",
   "docs/wechat-package-preflight.md",
@@ -98,6 +101,27 @@ if (!canvasShell.includes("hitTestCanvasLayout")) failures.push("canvas shell mi
 if (/document\.|querySelector|addEventListener|innerHTML|localStorage/.test(canvasShell)) {
   failures.push("canvas shell should not depend on browser DOM APIs");
 }
+
+const miniGameEntry = await readFile(join(root, "game.js"), "utf8");
+if (!miniGameEntry.includes("createWeChatMiniGameApp")) failures.push("WeChat entry missing app factory");
+if (!miniGameEntry.includes("onTouchStart")) failures.push("WeChat entry missing touch binding");
+if (!miniGameEntry.includes("requestAnimationFrame")) failures.push("WeChat entry missing frame loop");
+const privateEntryPattern = new RegExp([
+  ["App", "ID"].join(""),
+  "adunit-",
+  "project\\.config",
+  ["sec", "ret"].join(""),
+  ["pass", "word"].join(""),
+  ["K", "YC"].join(""),
+  ["pay", "out"].join(""),
+].join("|"));
+if (privateEntryPattern.test(miniGameEntry)) {
+  failures.push("WeChat entry should not contain account, ad unit, or payment setup");
+}
+
+const miniGameConfig = JSON.parse(await readFile(join(root, "game.json"), "utf8"));
+if (miniGameConfig.deviceOrientation !== "portrait") failures.push("game.json should declare portrait orientation");
+if (miniGameConfig.showStatusBar !== false) failures.push("game.json should hide status bar for canvas play");
 
 for (const file of await walk(root)) {
   if (!checkedExtensions.has(extname(file))) continue;

@@ -30,12 +30,12 @@ const browserOnlyModules = [
 const requiredPackageFiles = [
   {
     path: "game.js",
-    status: "shell-ready",
-    purpose: "Use the existing canvas shell, load shared game logic, wire WeChat touch events, and call the platform adapter.",
+    status: "entry-ready",
+    purpose: "Create the platform canvas, import the canvas shell, wire WeChat touch events, and start the frame loop.",
   },
   {
     path: "game.json",
-    status: "planned",
+    status: "entry-ready",
     purpose: "Declare orientation and mini game runtime settings.",
   },
   {
@@ -60,7 +60,7 @@ const userGates = [
 
 export async function createWeChatPackagePlan({ rootDir = root } = {}) {
   const files = [];
-  for (const file of [...reusableModules, ...browserOnlyModules.map((item) => item.path), "README.md", "docs/wechat-port-plan.md"]) {
+  for (const file of [...reusableModules, ...browserOnlyModules.map((item) => item.path), "game.js", "game.json", "README.md", "docs/wechat-port-plan.md"]) {
     files.push(await inspectFile(rootDir, file));
   }
 
@@ -104,6 +104,14 @@ export function auditWeChatPackagePlan(plan) {
   if (!plan.userGates.some((gate) => gate.includes("owner-only"))) failures.push("owner-only account gate missing");
   const canvasShell = plan.files.find((file) => file.path === "src/canvas-shell.js");
   if (!canvasShell || canvasShell.browserOnly) failures.push("canvas shell must stay free of browser DOM bindings");
+  const entry = plan.files.find((file) => file.path === "game.js");
+  if (!entry || entry.browserOnly) failures.push("WeChat entry must stay free of browser DOM bindings");
+  if (!plan.requiredPackageFiles.some((file) => file.path === "game.js" && file.status === "entry-ready")) {
+    failures.push("game.js entry status should be entry-ready");
+  }
+  if (!plan.requiredPackageFiles.some((file) => file.path === "game.json" && file.status === "entry-ready")) {
+    failures.push("game.json status should be entry-ready");
+  }
 
   return {
     ok: failures.length === 0,

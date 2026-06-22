@@ -71,6 +71,9 @@ for (const image of ["docs/media/mobile-start.png", "docs/media/mobile-complete.
 const adapter = await readFile(join(root, "src/wechat-adapter.js"), "utf8");
 if (!adapter.includes("createRewardedVideoAd")) failures.push("wechat adapter missing rewarded video hook");
 if (!adapter.includes("createInterstitialAd")) failures.push("wechat adapter missing interstitial hook");
+if (!adapter.includes("readiness")) failures.push("wechat adapter missing readiness boundary");
+if (!adapter.includes("missing-rewarded-ad-unit")) failures.push("wechat adapter should refuse missing rewarded ad units in WeChat");
+if (/adUnitId:\s*["']REPLACE_WITH_/.test(adapter)) failures.push("wechat adapter should not ship placeholder ad unit ids");
 
 const html = await readFile(join(root, "index.html"), "utf8");
 for (const id of ["quick-start-button", "hint-button", "time-button", "revive-button", "share-button", "glyph-grid", "goal-line", "profile-line", "result-card", "leaderboard-list"]) {

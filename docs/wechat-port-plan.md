@@ -17,12 +17,13 @@ Hanzi Scout 第一版只做短局玩法，不做复杂养成：
 
 当前浏览器原型的微信边界是 `src/wechat-adapter.js`：
 
-- `wx.createRewardedVideoAd`：提示、加时、超时复活。
-- `wx.createInterstitialAd`：从第二局开始完成后展示，不在开局前或首局结束时强插。
+- `wx.createRewardedVideoAd`：提示、加时、超时复活；微信环境下缺真实广告位时不发放奖励。
+- `wx.createInterstitialAd`：从第二局开始完成后展示，不在开局前或首局结束时强插；缺真实广告位时跳过。
 - `wx.shareAppMessage`：分享成绩。
 - `wx.getStorageSync` / `wx.setStorageSync`：保存本地记录。
+- `readiness`：给打包前检查暴露环境、广告位、分享和存储状态。
 
-广告单元 id 仍然是占位符。只有账号所有者在微信平台创建广告单元以后，才能替换为真实 id。
+广告单元 id 不写入公开仓库。只有账号所有者在微信平台创建广告单元以后，才能通过打包配置注入真实 id。
 
 ## 第一版审核包建议
 
@@ -32,8 +33,9 @@ Hanzi Scout 第一版只做短局玩法，不做复杂养成：
 4. 用小游戏渲染层替换 DOM 页面。
 5. 替换广告单元 id。
 6. 验证激励视频关闭行为：只有完整观看才发放提示、加时或复活。
-7. 保持第一版广告克制：只保留提示、加时、复活和第二局后的结束间隙，不做开屏式强打断。
-8. 准备隐私、类目、内容审核材料。
+7. 先检查 `readiness.rewardedAdReady` 与 `readiness.interstitialAdReady`，缺广告位时只允许作为无广告试玩包。
+8. 保持第一版广告克制：只保留提示、加时、复活和第二局后的结束间隙，不做开屏式强打断。
+9. 准备隐私、类目、内容审核材料。
 
 ## 暂不做的内容
 

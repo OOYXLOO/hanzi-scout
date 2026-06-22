@@ -1,19 +1,31 @@
-export function createPlatformAdapter({ wxApi = globalThis.wx } = {}) {
+export function createPlatformAdapter({ wxApi = globalThis.wx, adUnits = readAdUnitConfig(globalThis) } = {}) {
   const isWeChat = Boolean(wxApi);
-  const rewarded = isWeChat && wxApi.createRewardedVideoAd
-    ? wxApi.createRewardedVideoAd({ adUnitId: "REPLACE_WITH_REWARDED_AD_UNIT_ID" })
+  const rewardedAdUnitId = normalizeAdUnitId(adUnits.rewarded);
+  const interstitialAdUnitId = normalizeAdUnitId(adUnits.interstitial);
+  const rewarded = isWeChat && wxApi.createRewardedVideoAd && rewardedAdUnitId
+    ? wxApi.createRewardedVideoAd({ adUnitId: rewardedAdUnitId })
     : null;
-  const interstitial = isWeChat && wxApi.createInterstitialAd
-    ? wxApi.createInterstitialAd({ adUnitId: "REPLACE_WITH_INTERSTITIAL_AD_UNIT_ID" })
+  const interstitial = isWeChat && wxApi.createInterstitialAd && interstitialAdUnitId
+    ? wxApi.createInterstitialAd({ adUnitId: interstitialAdUnitId })
     : null;
 
   return {
     isWeChat,
+    readiness: {
+      environment: isWeChat ? "wechat" : "browser",
+      rewardedAdReady: !isWeChat || Boolean(rewarded),
+      interstitialAdReady: !isWeChat || Boolean(interstitial),
+      shareReady: Boolean(isWeChat && wxApi.shareAppMessage),
+      storageReady: Boolean(createStorageAdapter(wxApi)),
+    },
     storage: createStorageAdapter(wxApi),
     async showRewarded(reason) {
       if (!rewarded) {
-        await wait(320);
-        return { ok: true, simulated: true, reason };
+        if (!isWeChat) {
+          await wait(320);
+          return { ok: true, simulated: true, reason };
+        }
+        return { ok: false, simulated: false, reason, skipped: true, error: "missing-rewarded-ad-unit" };
       }
       return new Promise((resolve) => {
         const onClose = (res) => {
@@ -29,7 +41,7 @@ export function createPlatformAdapter({ wxApi = globalThis.wx } = {}) {
     },
     async showInterstitial() {
       if (!interstitial) {
-        return { ok: false, simulated: true };
+        return { ok: false, simulated: !isWeChat, skipped: isWeChat, error: isWeChat ? "missing-interstitial-ad-unit" : undefined };
       }
       try {
         await interstitial.show();
@@ -46,6 +58,20 @@ export function createPlatformAdapter({ wxApi = globalThis.wx } = {}) {
       return false;
     },
   };
+}
+
+function readAdUnitConfig(scope) {
+  return {
+    rewarded: scope?.__HANZI_SCOUT_CONFIG__?.adUnits?.rewarded || "",
+    interstitial: scope?.__HANZI_SCOUT_CONFIG__?.adUnits?.interstitial || "",
+  };
+}
+
+function normalizeAdUnitId(value) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.startsWith("REPLACE_WITH_")) return "";
+  return trimmed;
 }
 
 function createStorageAdapter(wxApi) {

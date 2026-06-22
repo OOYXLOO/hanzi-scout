@@ -14,7 +14,10 @@ const required = [
   "src/main.js",
   "src/styles.css",
   "tests/logic.test.mjs",
+  "tests/wechatPackageAudit.test.mjs",
   "docs/wechat-port-plan.md",
+  "docs/wechat-package-preflight.md",
+  "scripts/audit-wechat-package.mjs",
 ];
 const forbidden = [
   new RegExp(["money", "goal"].join("-"), "i"),
@@ -82,6 +85,10 @@ for (const id of ["quick-start-button", "hint-button", "time-button", "revive-bu
 
 const profile = await readFile(join(root, "src/profile.js"), "utf8");
 if (!profile.includes("createFriendLeaderboard")) failures.push("profile missing friend leaderboard generator");
+
+const wechatAudit = await readFile(join(root, "scripts/audit-wechat-package.mjs"), "utf8");
+if (!wechatAudit.includes("wechat-mini-game-package-preflight")) failures.push("wechat package audit missing target marker");
+if (!wechatAudit.includes("project.config.json")) failures.push("wechat package audit missing project config gate");
 
 for (const file of await walk(root)) {
   if (!checkedExtensions.has(extname(file))) continue;

@@ -30,6 +30,7 @@ The current mobile smoke pass uses a 390x844 viewport with 2x device scale. It v
 npm test
 npm run check
 npm run audit:local
+npm run audit:wechat
 npm run dev
 ```
 
@@ -44,5 +45,6 @@ npm run dev
 - `wx.shareAppMessage`：成绩分享。
 - `wx.getStorageSync` / `wx.setStorageSync`：迁移本地记录。
 - `readiness`：暴露浏览器/微信环境、广告位、分享、存储边界，方便之后打包前检查。
+- `npm run audit:wechat`：输出微信小游戏包结构预演，区分可复用逻辑、必须重写的 DOM/CSS 表面和用户 gate。
 
 真正的小程序版本需要在微信开发者工具内处理 AppID、广告位、类目、隐私、审核材料和发布流程。

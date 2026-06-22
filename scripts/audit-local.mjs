@@ -20,9 +20,12 @@ const required = [
   "tests/canvasShell.test.mjs",
   "tests/wechatEntry.test.mjs",
   "tests/wechatPackageAudit.test.mjs",
+  "tests/exportPublisherHandoffCli.test.mjs",
   "docs/wechat-port-plan.md",
   "docs/wechat-package-preflight.md",
+  "docs/publisher-handoff.md",
   "scripts/audit-wechat-package.mjs",
+  "scripts/export-publisher-handoff.mjs",
 ];
 const forbidden = [
   new RegExp(["money", "goal"].join("-"), "i"),
@@ -94,6 +97,17 @@ if (!profile.includes("createFriendLeaderboard")) failures.push("profile missing
 const wechatAudit = await readFile(join(root, "scripts/audit-wechat-package.mjs"), "utf8");
 if (!wechatAudit.includes("wechat-mini-game-package-preflight")) failures.push("wechat package audit missing target marker");
 if (!wechatAudit.includes("project.config.json")) failures.push("wechat package audit missing project config gate");
+
+const publisherHandoff = await readFile(join(root, "docs/publisher-handoff.md"), "utf8");
+for (const marker of [
+  "Hanzi Scout Publisher Handoff",
+  "Current Public Build",
+  "Owner-Side Batch Gates",
+  "Verification Commands",
+  "Release Evidence",
+]) {
+  if (!publisherHandoff.includes(marker)) failures.push(`publisher handoff missing ${marker}`);
+}
 
 const canvasShell = await readFile(join(root, "src/canvas-shell.js"), "utf8");
 if (!canvasShell.includes("createCanvasGameShell")) failures.push("canvas shell missing runtime factory");

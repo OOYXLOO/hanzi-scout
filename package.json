@@ -6,8 +6,9 @@
   "description": "A lightweight glyph-spotting puzzle prototype designed for quick mobile sessions.",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "test": "node tests/logic.test.mjs && node tests/canvasShell.test.mjs && node tests/wechatEntry.test.mjs && node tests/wechatPackageAudit.test.mjs",
-    "check": "node --check game.js && node --check src/levels.js && node --check src/game.js && node --check src/profile.js && node --check src/wechat-adapter.js && node --check src/canvas-shell.js && node --check src/main.js && node --check scripts/audit-local.mjs && node --check scripts/audit-wechat-package.mjs && node --check scripts/serve.mjs && node --check tests/logic.test.mjs && node --check tests/canvasShell.test.mjs && node --check tests/wechatEntry.test.mjs && node --check tests/wechatPackageAudit.test.mjs",
+    "export:publisher-handoff": "node scripts/export-publisher-handoff.mjs",
+    "test": "node tests/logic.test.mjs && node tests/canvasShell.test.mjs && node tests/wechatEntry.test.mjs && node tests/wechatPackageAudit.test.mjs && node tests/exportPublisherHandoffCli.test.mjs",
+    "check": "node --check game.js && node --check src/levels.js && node --check src/game.js && node --check src/profile.js && node --check src/wechat-adapter.js && node --check src/canvas-shell.js && node --check src/main.js && node --check scripts/audit-local.mjs && node --check scripts/audit-wechat-package.mjs && node --check scripts/export-publisher-handoff.mjs && node --check scripts/serve.mjs && node --check tests/logic.test.mjs && node --check tests/canvasShell.test.mjs && node --check tests/wechatEntry.test.mjs && node --check tests/wechatPackageAudit.test.mjs && node --check tests/exportPublisherHandoffCli.test.mjs",
     "audit:local": "node scripts/audit-local.mjs",
     "audit:wechat": "node scripts/audit-wechat-package.mjs"
   },

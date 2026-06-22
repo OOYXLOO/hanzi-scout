@@ -193,6 +193,25 @@ export function createShareText(state) {
   return `Hanzi Scout ${summary.dayKey}：${status} ${summary.solved}/${summary.total}，${summary.score} 分，最高连击 x${summary.bestCombo}${goal}。`;
 }
 
+export function createSharePayload(state, { source = "share" } = {}) {
+  const summary = createRunSummary(state);
+  const text = createShareText(state);
+  const query = [
+    ["day", summary.dayKey],
+    ["score", String(summary.score)],
+    ["solved", String(summary.solved)],
+    ["from", source],
+  ]
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return {
+    title: text,
+    text,
+    query,
+  };
+}
+
 export function createProgress(state) {
   return state.run.rounds.map((round, index) => {
     const solved = state.solved.some((entry) => entry.roundId === round.id);

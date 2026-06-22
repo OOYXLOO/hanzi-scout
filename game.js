@@ -1,4 +1,6 @@
 import { createCanvasGameShell } from "./src/canvas-shell.js";
+import { createGameState } from "./src/game.js";
+import { getDayKey } from "./src/levels.js";
 import { createPlatformAdapter } from "./src/wechat-adapter.js";
 
 export function createWeChatMiniGameApp({
@@ -6,6 +8,7 @@ export function createWeChatMiniGameApp({
   canvas = wxApi?.createCanvas?.() || globalThis.canvas,
   platform = createPlatformAdapter({ wxApi }),
   frameMs = 1000 / 30,
+  state,
 } = {}) {
   if (!canvas) {
     throw new Error("A WeChat canvas is required.");
@@ -13,12 +16,14 @@ export function createWeChatMiniGameApp({
 
   const context = canvas.getContext("2d");
   const metrics = readScreenMetrics(wxApi, canvas);
+  const launchDayKey = normalizeLaunchDayKey(readLaunchOptions(wxApi)?.query?.day);
   prepareCanvas(canvas, context, metrics);
 
   const shell = createCanvasGameShell({
     canvas,
     context,
     platform,
+    state: state || createGameState({ dayKey: launchDayKey || getDayKey() }),
     width: metrics.width,
     height: metrics.height,
   });
@@ -67,6 +72,19 @@ export function createWeChatMiniGameApp({
       unbindTouch();
     },
   };
+}
+
+export function normalizeLaunchDayKey(value) {
+  const text = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
+}
+
+function readLaunchOptions(wxApi) {
+  try {
+    return wxApi?.getLaunchOptionsSync?.() || {};
+  } catch {
+    return {};
+  }
 }
 
 function readScreenMetrics(wxApi, canvas) {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "../src/game.js";
+import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createSharePayload, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "../src/game.js";
 import { createDailyGoal, createRound, createRun, quadrantForIndex } from "../src/levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "../src/profile.js";
 import { createPlatformAdapter } from "../src/wechat-adapter.js";
@@ -31,6 +31,10 @@ assert.equal(state.currentRound, 1);
 assert.equal(state.solved.length, 1);
 assert.equal(createProgress(state)[0].solved, true);
 assert.match(createShareText(state), /Hanzi Scout 2026-06-21/);
+const sharePayload = createSharePayload(state, { source: "test-share" });
+assert.match(sharePayload.title, /Hanzi Scout 2026-06-21/);
+assert.match(sharePayload.query, /day=2026-06-21/);
+assert.match(sharePayload.query, /from=test-share/);
 
 time += 15_000;
 const remainingBefore = getRemainingSeconds(state);
@@ -78,6 +82,8 @@ const completeAdapter = createPlatformAdapter({
 assert.equal(completeAdapter.readiness.rewardedAdReady, true);
 assert.equal((await completeAdapter.showRewarded("revive")).ok, true);
 assert.equal(await completeAdapter.showInterstitial().then((result) => result.ok), true);
+assert.equal(completeAdapter.share(sharePayload), true);
+assert.match(completeWx.sharedMessage.query, /day=2026-06-21/);
 assert.equal(completeWx.createdRewarded.adUnitId, "adunit-rewarded");
 
 const abandonedWx = createFakeWxApi({ rewardedClose: { isEnded: false } });
@@ -160,7 +166,9 @@ function createFakeWxApi({ rewardedClose = { isEnded: true } } = {}) {
         },
       };
     },
-    shareAppMessage() {},
+    shareAppMessage(message) {
+      wx.sharedMessage = message;
+    },
     getStorageSync(key) {
       return values.get(key) || "";
     },

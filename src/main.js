@@ -1,4 +1,4 @@
-import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "./game.js";
+import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createSharePayload, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "./game.js";
 import { getDayKey } from "./levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "./profile.js";
 import { createPlatformAdapter } from "./wechat-adapter.js";
@@ -118,10 +118,10 @@ refs.revive.addEventListener("click", async () => {
 });
 
 refs.share.addEventListener("click", async () => {
-  const text = createShareText(state);
-  refs.shareText.value = text;
-  if (!platform.share(text) && navigator.clipboard) {
-    await navigator.clipboard.writeText(text);
+  const payload = createSharePayload(state, { source: "browser-share" });
+  refs.shareText.value = payload.text;
+  if (!platform.share(payload) && navigator.clipboard) {
+    await navigator.clipboard.writeText(payload.text);
     refs.share.textContent = "已复制";
     window.setTimeout(() => {
       refs.share.textContent = "分享成绩";

@@ -51,7 +51,8 @@ assert.equal(state.awaitingRevive, false);
 const share = await shell.handleTouch(centerOf(shell.layout.buttons.find((button) => button.action === CANVAS_ACTIONS.SHARE)));
 assert.equal(share.ok, true);
 assert.match(share.text, /Hanzi Scout 2026-06-22/);
-assert.equal(platform.sharedText, share.text);
+assert.equal(platform.sharedPayload.text, share.text);
+assert.match(platform.sharedPayload.query, /day=2026-06-22/);
 
 const canvasShellSource = await readFile(new URL("../src/canvas-shell.js", import.meta.url), "utf8");
 assert.doesNotMatch(canvasShellSource, /document\.|querySelector|addEventListener|innerHTML|localStorage/);
@@ -78,7 +79,7 @@ function createFakePlatform() {
   return {
     storage: null,
     rewardedReasons: [],
-    sharedText: "",
+    sharedPayload: null,
     async showRewarded(reason) {
       this.rewardedReasons.push(reason);
       return { ok: true, simulated: true, reason };
@@ -86,8 +87,8 @@ function createFakePlatform() {
     async showInterstitial() {
       return { ok: true, simulated: true };
     },
-    share(text) {
-      this.sharedText = text;
+    share(payload) {
+      this.sharedPayload = payload;
       return true;
     },
   };

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { createWeChatMiniGameApp } from "../game.js";
+import { createWeChatMiniGameApp, normalizeLaunchDayKey } from "../game.js";
 import { getCurrentRound } from "../src/game.js";
 
 const wxApi = createFakeWxApi();
@@ -16,6 +16,9 @@ assert.equal(wxApi.canvas.height, 1688);
 assert.equal(wxApi.context.scaleCalls.length, 1);
 assert.equal(wxApi.touchHandlers.size, 1);
 assert.equal(wxApi.requestedFrames.length, 1);
+assert.equal(app.shell.state.run.dayKey, "2026-06-18");
+assert.equal(normalizeLaunchDayKey("2026-06-19"), "2026-06-19");
+assert.equal(normalizeLaunchDayKey("bad-day"), "");
 
 const startButton = app.shell.layout.buttons[0];
 await app.handleTouchEvent({
@@ -97,6 +100,13 @@ function createFakeWxApi() {
         windowWidth: 390,
         windowHeight: 844,
         pixelRatio: 2,
+      };
+    },
+    getLaunchOptionsSync() {
+      return {
+        query: {
+          day: "2026-06-18",
+        },
       };
     },
     onTouchStart(handler) {

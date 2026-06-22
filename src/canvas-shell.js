@@ -3,8 +3,8 @@ import {
   canUseReward,
   createGameState,
   createProgress,
+  createSharePayload,
   createRunSummary,
-  createShareText,
   finishRun,
   getCurrentRound,
   getRemainingSeconds,
@@ -210,10 +210,10 @@ export function createCanvasGameShell({
     }
 
     if (action === CANVAS_ACTIONS.SHARE) {
-      const text = createShareText(state);
-      const shared = platform.share(text);
+      const payload = createSharePayload(state, { source: "canvas-share" });
+      const shared = platform.share(payload);
       status = shared ? "已打开分享。" : "成绩已生成，可复制分享。";
-      return { ok: true, action, text, shared };
+      return { ok: true, action, text: payload.text, payload, shared };
     }
 
     return { ok: false, action, reason: "unknown-action" };

@@ -50,9 +50,16 @@ export function createPlatformAdapter({ wxApi = globalThis.wx, adUnits = readAdU
         return { ok: false, simulated: false };
       }
     },
-    share(text) {
+    share(payloadOrText) {
+      const payload = typeof payloadOrText === "string"
+        ? { title: payloadOrText, text: payloadOrText }
+        : payloadOrText || {};
+      const title = String(payload.title || payload.text || "Hanzi Scout").slice(0, 96);
       if (isWeChat && wxApi.shareAppMessage) {
-        wxApi.shareAppMessage({ title: text });
+        const message = { title };
+        if (payload.query) message.query = String(payload.query);
+        if (payload.imageUrl) message.imageUrl = String(payload.imageUrl);
+        wxApi.shareAppMessage(message);
         return true;
       }
       return false;

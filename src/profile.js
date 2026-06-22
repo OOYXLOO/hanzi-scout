@@ -81,9 +81,9 @@ export function createScoreCard(profile, summary) {
   const next = normalizeProfile(profile);
   const clearRate = next.plays ? Math.round((next.completions / next.plays) * 100) : 0;
   return {
-    headline: summary.goalMet ? "Daily goal cleared" : summary.cleared ? "Board cleared" : "Run logged",
-    details: `${summary.solved}/${summary.total} boards · ${summary.score} pts · ${summary.misses} misses`,
-    record: `Best ${next.bestScore} on ${next.bestDay || summary.dayKey} · streak ${next.streak} day${next.streak === 1 ? "" : "s"} · clear ${clearRate}%`,
+    headline: summary.goalMet ? "今日目标达成" : summary.cleared ? "全部通关" : "本局已记录",
+    details: `${summary.solved}/${summary.total} 盘 · ${summary.score} 分 · 错点 ${summary.misses} 次`,
+    record: `最佳 ${next.bestScore} 分（${next.bestDay || summary.dayKey}）· 连续 ${next.streak} 天 · 通关率 ${clearRate}%`,
   };
 }
 

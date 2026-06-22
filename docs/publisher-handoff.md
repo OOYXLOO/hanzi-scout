@@ -11,9 +11,9 @@ This handoff keeps the browser preview, native mini game boundary, and owner-sid
 ## Release Evidence
 | File | Status | Bytes |
 | --- | --- | ---: |
-| `src/levels.js` | ready | 3037 |
+| `src/levels.js` | ready | 3002 |
 | `src/game.js` | ready | 6353 |
-| `src/profile.js` | ready | 5549 |
+| `src/profile.js` | ready | 5534 |
 | `src/wechat-adapter.js` | ready | 3527 |
 | `src/canvas-shell.js` | ready | 15897 |
 | `src/main.js` | ready | 10867 |

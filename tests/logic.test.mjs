@@ -12,6 +12,7 @@ const state = createGameState({
 
 assert.equal(state.run.rounds.length, 6);
 assert.equal(typeof state.run.goal.targetScore, "number");
+assert.match(state.run.goal.focus, /[\u4e00-\u9fff]/);
 assert.equal(getRemainingSeconds(state), 60);
 assert.equal(createRun({ dayKey: "2026-06-21" }).rounds[0].targetIndex, createRun({ dayKey: "2026-06-21" }).rounds[0].targetIndex);
 assert.deepEqual(createDailyGoal({ dayKey: "2026-06-21" }), createDailyGoal({ dayKey: "2026-06-21" }));
@@ -110,7 +111,10 @@ assert.equal(profile.bestScore, summary.score);
 assert.equal(profile.rewardViews.revive, 1);
 assert.equal(saveProfile(profile, { storage }), true);
 assert.equal(loadProfile({ storage }).bestScore, summary.score);
-assert.match(createScoreCard(profile, summary).record, /Best/);
+const scoreCard = createScoreCard(profile, summary);
+assert.match(scoreCard.record, /最佳/);
+assert.match(scoreCard.details, /错点/);
+assert.doesNotMatch(scoreCard.record, /Best|streak|clear/);
 const leaderboard = createFriendLeaderboard(profile, summary);
 assert.equal(leaderboard.length, 5);
 assert.equal(leaderboard.filter((entry) => entry.isPlayer).length, 1);

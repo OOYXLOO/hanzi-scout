@@ -1,16 +1,16 @@
 export const GLYPH_PAIRS = [
-  { target: "未", decoy: "末", label: "top stroke length" },
-  { target: "己", decoy: "已", label: "open lower hook" },
-  { target: "日", decoy: "目", label: "middle stroke count" },
-  { target: "土", decoy: "士", label: "lower stroke length" },
-  { target: "人", decoy: "入", label: "falling stroke direction" },
-  { target: "戊", decoy: "戌", label: "inner stroke" },
-  { target: "问", decoy: "间", label: "inside glyph" },
-  { target: "晴", decoy: "睛", label: "left radical" },
-  { target: "拆", decoy: "折", label: "right component" },
-  { target: "辨", decoy: "辩", label: "center component" },
-  { target: "祇", decoy: "祗", label: "small dot" },
-  { target: "候", decoy: "侯", label: "middle vertical" },
+  { target: "未", decoy: "末", label: "横画长短" },
+  { target: "己", decoy: "已", label: "下方开口" },
+  { target: "日", decoy: "目", label: "中间笔画数量" },
+  { target: "土", decoy: "士", label: "下横长短" },
+  { target: "人", decoy: "入", label: "撇捺方向" },
+  { target: "戊", decoy: "戌", label: "内部短画" },
+  { target: "问", decoy: "间", label: "门内字形" },
+  { target: "晴", decoy: "睛", label: "左侧偏旁" },
+  { target: "拆", decoy: "折", label: "右侧部件" },
+  { target: "辨", decoy: "辩", label: "中间部件" },
+  { target: "祇", decoy: "祗", label: "细小点画" },
+  { target: "候", decoy: "侯", label: "中间竖画" },
 ];
 
 function hashSeed(value) {

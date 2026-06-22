@@ -13,6 +13,7 @@ export function createEmptyProfile() {
     rewardViews: {
       hint: 0,
       extraTime: 0,
+      revive: 0,
     },
     history: [],
   };
@@ -60,6 +61,7 @@ export function recordRun(profile, summary) {
   if (summary.cleared) next.completions += 1;
   next.rewardViews.hint += summary.rewardUses?.hint || 0;
   next.rewardViews.extraTime += summary.rewardUses?.extraTime || 0;
+  next.rewardViews.revive += summary.rewardUses?.revive || 0;
 
   if (summary.score > next.bestScore) {
     next.bestScore = summary.score;

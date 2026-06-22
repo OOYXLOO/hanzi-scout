@@ -51,6 +51,12 @@ button.wide {
   margin-top: 12px;
 }
 
+.quick-start {
+  display: none;
+  width: 100%;
+  max-width: min(86vh, 720px);
+}
+
 button:disabled {
   cursor: wait;
   opacity: 0.65;
@@ -312,6 +318,10 @@ textarea {
     display: grid;
   }
 
+  .quick-start {
+    display: block;
+  }
+
   .mission-strip {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -327,7 +337,6 @@ textarea {
     padding: 12px;
   }
 
-  .mission-strip,
   .score-row,
   .button-grid {
     grid-template-columns: 1fr;

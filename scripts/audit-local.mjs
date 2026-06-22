@@ -73,7 +73,7 @@ if (!adapter.includes("createRewardedVideoAd")) failures.push("wechat adapter mi
 if (!adapter.includes("createInterstitialAd")) failures.push("wechat adapter missing interstitial hook");
 
 const html = await readFile(join(root, "index.html"), "utf8");
-for (const id of ["hint-button", "time-button", "share-button", "glyph-grid", "goal-line", "profile-line", "result-card", "leaderboard-list"]) {
+for (const id of ["quick-start-button", "hint-button", "time-button", "revive-button", "share-button", "glyph-grid", "goal-line", "profile-line", "result-card", "leaderboard-list"]) {
   if (!html.includes(id)) failures.push(`index.html missing ${id}`);
 }
 

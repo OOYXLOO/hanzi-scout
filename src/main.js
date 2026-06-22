@@ -1,4 +1,4 @@
-import { canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, startRun, tapCell } from "./game.js";
+import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "./game.js";
 import { getDayKey } from "./levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "./profile.js";
 import { createPlatformAdapter } from "./wechat-adapter.js";
@@ -13,8 +13,10 @@ const refs = {
   combo: document.querySelector("#combo-value"),
   status: document.querySelector("#status-line"),
   start: document.querySelector("#start-button"),
+  quickStart: document.querySelector("#quick-start-button"),
   hint: document.querySelector("#hint-button"),
   timeButton: document.querySelector("#time-button"),
+  revive: document.querySelector("#revive-button"),
   assist: document.querySelector("#assist-line"),
   share: document.querySelector("#share-button"),
   shareText: document.querySelector("#share-text"),
@@ -38,24 +40,24 @@ refs.goal.textContent = formatGoal();
 refs.profile.textContent = formatProfile();
 render();
 
-refs.start.addEventListener("click", () => {
+refs.start.addEventListener("click", beginOrRecordRun);
+refs.quickStart.addEventListener("click", beginOrRecordRun);
+
+function beginOrRecordRun() {
+  if (state.awaitingRevive) {
+    finishRun(state, "timeout");
+    stopTimer();
+    refs.status.textContent = "本局已记录。";
+    render();
+    return;
+  }
   startRun(state);
   recordedRunKey = null;
   interstitialRunKey = null;
   refs.status.textContent = "在倒计时结束前找出不同的汉字。";
-  if (timer) window.clearInterval(timer);
-  timer = window.setInterval(() => {
-    if (getRemainingSeconds(state) <= 0 && !state.complete) {
-      finishRun(state, "timeout");
-    }
-    if (state.complete) {
-      window.clearInterval(timer);
-      timer = null;
-    }
-    render();
-  }, 250);
+  startTimer();
   render();
-});
+}
 
 refs.hint.addEventListener("click", async () => {
   if (!canUseReward(state, "hint")) {
@@ -95,6 +97,26 @@ refs.timeButton.addEventListener("click", async () => {
   render();
 });
 
+refs.revive.addEventListener("click", async () => {
+  if (!canOfferRevive(state)) {
+    refs.status.textContent = "当前还不能复活。";
+    render();
+    return;
+  }
+  refs.revive.disabled = true;
+  refs.status.textContent = "正在打开复活奖励...";
+  const reward = await platform.showRewarded("revive");
+  if (reward.ok) {
+    grantRevive(state, 15);
+    refs.status.textContent = "已复活 15 秒，继续找字。";
+    startTimer();
+  } else {
+    refs.status.textContent = "复活奖励没有完成。";
+  }
+  refs.revive.disabled = false;
+  render();
+});
+
 refs.share.addEventListener("click", async () => {
   const text = createShareText(state);
   refs.shareText.value = text;
@@ -118,8 +140,12 @@ function render() {
   refs.profile.textContent = formatProfile();
   refs.assist.textContent = formatAssist();
   renderLeaderboard(createRunSummary(state));
-  refs.hint.disabled = !state.startedAt || state.complete || !canUseReward(state, "hint");
-  refs.timeButton.disabled = !state.startedAt || state.complete || !canUseReward(state, "extraTime");
+  refs.hint.disabled = !state.startedAt || state.complete || state.awaitingRevive || !canUseReward(state, "hint");
+  refs.timeButton.disabled = !state.startedAt || state.complete || state.awaitingRevive || !canUseReward(state, "extraTime");
+  refs.revive.disabled = !canOfferRevive(state);
+  const startText = state.awaitingRevive ? "结束并记录" : state.startedAt && !state.complete ? "重新开始" : "开始挑战";
+  refs.start.textContent = startText;
+  refs.quickStart.textContent = startText;
   renderProgress();
 
   if (state.complete || !round) {
@@ -143,7 +169,7 @@ function render() {
       button.className = `glyph-cell${state.hint && hintMatches(index, round) ? " hinted" : ""}`;
       button.textContent = cell.glyph;
       button.setAttribute("aria-label", `cell ${index + 1}`);
-      button.disabled = !state.startedAt;
+      button.disabled = !state.startedAt || state.awaitingRevive;
       button.addEventListener("click", () => {
         const result = tapCell(state, index);
         if (result.correct) {
@@ -183,6 +209,7 @@ function recordCompletion() {
 function showEndInterstitialOnce() {
   const key = `${state.startedAt || "preview"}:${state.run.dayKey}`;
   if (!state.startedAt || interstitialRunKey === key) return;
+  if (profile.plays <= 1) return;
   interstitialRunKey = key;
   platform.showInterstitial();
 }
@@ -193,7 +220,7 @@ function formatGoal() {
 }
 
 function formatAssist() {
-  return `提示 ${state.rewardUses.hint}/2，加时 ${state.rewardUses.extraTime}/1。浏览器模式只模拟完成。`;
+  return `提示 ${state.rewardUses.hint}/2，加时 ${state.rewardUses.extraTime}/1，复活 ${state.rewardUses.revive}/1。浏览器模式只模拟完成。`;
 }
 
 function formatProfile() {
@@ -229,4 +256,28 @@ function renderProgress() {
       return li;
     }),
   );
+}
+
+function startTimer() {
+  stopTimer();
+  timer = window.setInterval(() => {
+    if (getRemainingSeconds(state) <= 0 && !state.complete) {
+      if (pauseForRevive(state)) {
+        refs.status.textContent = "时间到了，可以复活 15 秒，或结束并记录本局。";
+        stopTimer();
+      } else {
+        finishRun(state, "timeout");
+      }
+    }
+    if (state.complete) {
+      stopTimer();
+    }
+    render();
+  }, 250);
+}
+
+function stopTimer() {
+  if (!timer) return;
+  window.clearInterval(timer);
+  timer = null;
 }

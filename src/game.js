@@ -16,8 +16,10 @@ export function createGameState({ now = () => Date.now(), dayKey, rounds = 6 } =
     rewardUses: {
       hint: 0,
       extraTime: 0,
+      revive: 0,
     },
     finishedReason: null,
+    awaitingRevive: false,
     complete: false,
   };
 }
@@ -35,8 +37,10 @@ export function startRun(state) {
   state.rewardUses = {
     hint: 0,
     extraTime: 0,
+    revive: 0,
   };
   state.finishedReason = null;
+  state.awaitingRevive = false;
   state.complete = false;
   return state;
 }
@@ -87,7 +91,7 @@ export function tapCell(state, cellIndex) {
 
 export function grantHint(state) {
   const round = getCurrentRound(state);
-  if (!round || state.complete || !canUseReward(state, "hint")) {
+  if (!round || state.complete || state.awaitingRevive || !canUseReward(state, "hint")) {
     return null;
   }
   state.rewardUses.hint += 1;
@@ -99,7 +103,7 @@ export function grantHint(state) {
 }
 
 export function grantExtraTime(state, seconds = 10) {
-  if (!state.startedAt || state.complete || !canUseReward(state, "extraTime")) {
+  if (!state.startedAt || state.complete || state.awaitingRevive || !canUseReward(state, "extraTime")) {
     return 0;
   }
   state.rewardUses.extraTime += 1;
@@ -107,10 +111,45 @@ export function grantExtraTime(state, seconds = 10) {
   return getRemainingSeconds(state);
 }
 
+export function canOfferRevive(state) {
+  return Boolean(
+    state.startedAt &&
+      state.awaitingRevive &&
+      !state.complete &&
+      state.currentRound < state.run.rounds.length &&
+      canUseReward(state, "revive"),
+  );
+}
+
+export function pauseForRevive(state) {
+  if (!state.startedAt || state.complete || state.currentRound >= state.run.rounds.length) {
+    return false;
+  }
+  if (!canUseReward(state, "revive")) {
+    finishRun(state, "timeout");
+    return false;
+  }
+  state.awaitingRevive = true;
+  state.endsAt = state.now();
+  return true;
+}
+
+export function grantRevive(state, seconds = 15) {
+  if (!canOfferRevive(state)) {
+    return 0;
+  }
+  state.rewardUses.revive += 1;
+  state.awaitingRevive = false;
+  state.finishedReason = null;
+  state.endsAt = state.now() + seconds * 1000;
+  return getRemainingSeconds(state);
+}
+
 export function canUseReward(state, reason) {
   const limits = {
     hint: 2,
     extraTime: 1,
+    revive: 1,
   };
   return (state.rewardUses?.[reason] || 0) < (limits[reason] || 0);
 }
@@ -119,6 +158,7 @@ export function finishRun(state, reason = "ended") {
   if (state.complete) {
     return state;
   }
+  state.awaitingRevive = false;
   state.complete = true;
   state.finishedReason = reason;
   return state;

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, startRun, tapCell } from "../src/game.js";
+import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "../src/game.js";
 import { createDailyGoal, createRound, createRun, quadrantForIndex } from "../src/levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "../src/profile.js";
 import { createPlatformAdapter } from "../src/wechat-adapter.js";
@@ -37,11 +37,21 @@ const remainingBefore = getRemainingSeconds(state);
 grantExtraTime(state, 10);
 assert.equal(getRemainingSeconds(state), remainingBefore + 10);
 assert.equal(canUseReward(state, "extraTime"), false);
+assert.equal(canUseReward(state, "revive"), true);
 
+time = state.endsAt;
+assert.equal(pauseForRevive(state), true);
+assert.equal(state.awaitingRevive, true);
+assert.equal(canOfferRevive(state), true);
+assert.equal(grantRevive(state, 15), 15);
+assert.equal(state.awaitingRevive, false);
+assert.equal(state.rewardUses.revive, 1);
+assert.equal(canUseReward(state, "revive"), false);
 finishRun(state, "timeout");
 const summary = createRunSummary(state);
 assert.equal(summary.finishedReason, "timeout");
 assert.equal(summary.solved, 1);
+assert.equal(summary.rewardUses.revive, 1);
 assert.match(createShareText(state), /Hanzi Scout 2026-06-21/);
 
 const adapter = createPlatformAdapter({ wxApi: null });
@@ -55,6 +65,7 @@ profile = recordRun(profile, summary);
 assert.equal(profile.plays, 1);
 assert.equal(profile.streak, 1);
 assert.equal(profile.bestScore, summary.score);
+assert.equal(profile.rewardViews.revive, 1);
 assert.equal(saveProfile(profile, { storage }), true);
 assert.equal(loadProfile({ storage }).bestScore, summary.score);
 assert.match(createScoreCard(profile, summary).record, /Best/);

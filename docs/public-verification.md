@@ -7,11 +7,13 @@ Last checked: 2026-06-22
 - Source: https://github.com/OOYXLOO/hanzi-scout
 - GitHub Pages: https://ooyxloo.github.io/hanzi-scout/
 
-## Current Public Head
+## Verified Source Baseline
 
 - Branch: `master`
-- Commit: `91af77e52e520b468476258fa040fda213e05c75`
-- Commit message: `Add Pages deployment workflow`
+- Baseline commit before this verification note: `91af77e52e520b468476258fa040fda213e05c75`
+- Baseline commit message: `Add Pages deployment workflow`
+
+The latest repository head is intentionally left to GitHub's commit history so this document does not become stale after documentation-only commits.
 
 ## Verified Checks
 

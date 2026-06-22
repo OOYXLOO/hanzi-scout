@@ -44,6 +44,11 @@ const requiredPackageFiles = [
     purpose: "Created in WeChat DevTools after the owner supplies AppID and project settings.",
   },
   {
+    path: "project.config.example.json",
+    status: "template-ready",
+    purpose: "Safe import template using touristappid; copy locally before owner-side AppID configuration.",
+  },
+  {
     path: "ad-unit.config.js",
     status: "user-gated",
     purpose: "Inject real ad unit ids outside the public source tree.",
@@ -60,9 +65,19 @@ const userGates = [
 
 export async function createWeChatPackagePlan({ rootDir = root } = {}) {
   const files = [];
-  for (const file of [...reusableModules, ...browserOnlyModules.map((item) => item.path), "game.js", "game.json", "README.md", "docs/wechat-port-plan.md"]) {
+  for (const file of [
+    ...reusableModules,
+    ...browserOnlyModules.map((item) => item.path),
+    "game.js",
+    "game.json",
+    "project.config.example.json",
+    "README.md",
+    "docs/wechat-port-plan.md",
+    "docs/wechat-devtools-import.md",
+  ]) {
     files.push(await inspectFile(rootDir, file));
   }
+  const projectConfigExample = await readProjectConfigExample(rootDir);
 
   return {
     target: "wechat-mini-game-package-preflight",
@@ -72,8 +87,9 @@ export async function createWeChatPackagePlan({ rootDir = root } = {}) {
     userGates,
     adapterConfig: {
       source: "globalThis.__HANZI_SCOUT_CONFIG__.adUnits",
-      rule: "Do not hard-code real ad unit ids, AppID, accounts, or platform settings in this repository.",
+      rule: "Do not hard-code real ad unit ids, AppID, accounts, or owner-only platform settings in this repository.",
     },
+    projectConfigExample,
     files,
   };
 }
@@ -112,11 +128,36 @@ export function auditWeChatPackagePlan(plan) {
   if (!plan.requiredPackageFiles.some((file) => file.path === "game.json" && file.status === "entry-ready")) {
     failures.push("game.json status should be entry-ready");
   }
+  const projectConfigExample = plan.files.find((file) => file.path === "project.config.example.json");
+  if (!projectConfigExample || !projectConfigExample.exists) failures.push("project config example missing");
+  if (!plan.requiredPackageFiles.some((file) => file.path === "project.config.example.json" && file.status === "template-ready")) {
+    failures.push("project config example should be template-ready");
+  }
+  if (plan.projectConfigExample?.appid !== "touristappid") failures.push("project config example must use touristappid");
+  if (plan.projectConfigExample?.compileType !== "game") failures.push("project config example must use compileType game");
+  if (plan.projectConfigExample?.containsPrivateConfig) failures.push("project config example includes private configuration markers");
 
   return {
     ok: failures.length === 0,
     failures,
   };
+}
+
+async function readProjectConfigExample(rootDir) {
+  try {
+    const text = await readFile(join(rootDir, "project.config.example.json"), "utf8");
+    const config = JSON.parse(text);
+    return {
+      appid: config.appid,
+      compileType: config.compileType,
+      projectname: config.projectname,
+      containsPrivateConfig: /adunit|secret|token|key|owner-only/i.test(text),
+    };
+  } catch (error) {
+    return {
+      error: error.message,
+    };
+  }
 }
 
 async function inspectFile(rootDir, path) {

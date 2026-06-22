@@ -17,4 +17,4 @@ Screenshots:
 - `docs/media/mobile-start.png`
 - `docs/media/mobile-complete.png`
 
-This check uses the browser prototype only. It does not access WeChat account data, real friend data, ad units, payment setup, or platform consoles.
+This check uses the browser prototype only. It does not access WeChat account data, real friend data, ad units, or platform consoles.

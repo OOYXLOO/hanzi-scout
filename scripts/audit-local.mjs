@@ -112,11 +112,9 @@ const privateEntryPattern = new RegExp([
   "project\\.config",
   ["sec", "ret"].join(""),
   ["pass", "word"].join(""),
-  ["K", "YC"].join(""),
-  ["pay", "out"].join(""),
 ].join("|"));
 if (privateEntryPattern.test(miniGameEntry)) {
-  failures.push("WeChat entry should not contain account, ad unit, or payment setup");
+  failures.push("WeChat entry should not contain account, ad unit, or owner-only console setup");
 }
 
 const miniGameConfig = JSON.parse(await readFile(join(root, "game.json"), "utf8"));

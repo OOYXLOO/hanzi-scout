@@ -28,8 +28,13 @@ The command prints a deterministic package plan and fails if the migration bound
 
 - `game.js`: small WeChat entrypoint that creates the platform canvas, imports `src/canvas-shell.js`, and binds touch/tick events.
 - `game.json`: mini game orientation/runtime settings.
+- `project.config.example.json`: safe DevTools import template with `appid` set to `touristappid`.
 - `project.config.json`: created in WeChat DevTools after AppID exists.
 - `ad-unit.config.js`: injected outside public source when real ad units exist.
+
+## DevTools Import
+
+Use `docs/wechat-devtools-import.md` for the owner-side import checklist. Copy `project.config.example.json` to an ignored local `project.config.json`, then replace the template AppID inside WeChat DevTools. Do not commit real owner-only project settings.
 
 ## Gates
 

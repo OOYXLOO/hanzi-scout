@@ -9,6 +9,7 @@ const reusableModules = [
   "src/game.js",
   "src/profile.js",
   "src/wechat-adapter.js",
+  "src/canvas-shell.js",
 ];
 
 const browserOnlyModules = [
@@ -29,8 +30,8 @@ const browserOnlyModules = [
 const requiredPackageFiles = [
   {
     path: "game.js",
-    status: "planned",
-    purpose: "Create the canvas shell, load shared game logic, wire touch input, and call the platform adapter.",
+    status: "shell-ready",
+    purpose: "Use the existing canvas shell, load shared game logic, wire WeChat touch events, and call the platform adapter.",
   },
   {
     path: "game.json",
@@ -84,7 +85,7 @@ export function auditWeChatPackagePlan(plan) {
   }
 
   const reusable = new Set(plan.reusableModules);
-  for (const file of ["src/levels.js", "src/game.js", "src/profile.js", "src/wechat-adapter.js"]) {
+  for (const file of ["src/levels.js", "src/game.js", "src/profile.js", "src/wechat-adapter.js", "src/canvas-shell.js"]) {
     if (!reusable.has(file)) failures.push(`reusable module not listed: ${file}`);
   }
 
@@ -101,6 +102,8 @@ export function auditWeChatPackagePlan(plan) {
   if (!plan.adapterConfig.rule.includes("Do not hard-code")) failures.push("adapter config rule is too weak");
   if (!plan.userGates.some((gate) => gate.includes("AppID"))) failures.push("AppID gate missing");
   if (!plan.userGates.some((gate) => gate.includes("owner-only"))) failures.push("owner-only account gate missing");
+  const canvasShell = plan.files.find((file) => file.path === "src/canvas-shell.js");
+  if (!canvasShell || canvasShell.browserOnly) failures.push("canvas shell must stay free of browser DOM bindings");
 
   return {
     ok: failures.length === 0,

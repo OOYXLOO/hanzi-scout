@@ -11,9 +11,11 @@ const required = [
   "src/game.js",
   "src/profile.js",
   "src/wechat-adapter.js",
+  "src/canvas-shell.js",
   "src/main.js",
   "src/styles.css",
   "tests/logic.test.mjs",
+  "tests/canvasShell.test.mjs",
   "tests/wechatPackageAudit.test.mjs",
   "docs/wechat-port-plan.md",
   "docs/wechat-package-preflight.md",
@@ -89,6 +91,13 @@ if (!profile.includes("createFriendLeaderboard")) failures.push("profile missing
 const wechatAudit = await readFile(join(root, "scripts/audit-wechat-package.mjs"), "utf8");
 if (!wechatAudit.includes("wechat-mini-game-package-preflight")) failures.push("wechat package audit missing target marker");
 if (!wechatAudit.includes("project.config.json")) failures.push("wechat package audit missing project config gate");
+
+const canvasShell = await readFile(join(root, "src/canvas-shell.js"), "utf8");
+if (!canvasShell.includes("createCanvasGameShell")) failures.push("canvas shell missing runtime factory");
+if (!canvasShell.includes("hitTestCanvasLayout")) failures.push("canvas shell missing touch hit test");
+if (/document\.|querySelector|addEventListener|innerHTML|localStorage/.test(canvasShell)) {
+  failures.push("canvas shell should not depend on browser DOM APIs");
+}
 
 for (const file of await walk(root)) {
   if (!checkedExtensions.has(extname(file))) continue;

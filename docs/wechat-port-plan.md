@@ -28,9 +28,9 @@ Hanzi Scout 第一版只做短局玩法，不做复杂养成：
 ## 第一版审核包建议
 
 1. 创建微信小游戏 AppID。
-2. 选择最小迁移路径：Canvas 小游戏壳或兼容小游戏的打包模板。
+2. 选择最小迁移路径：使用现有 `src/canvas-shell.js` 作为 Canvas/touch 小游戏壳。
 3. 迁移 `src/game.js`、`src/levels.js`、`src/profile.js` 的纯逻辑。
-4. 用小游戏渲染层替换 DOM 页面。
+4. 用小游戏入口 `game.js` 绑定平台 canvas、touch 事件和帧循环，浏览器 DOM 页面只保留为演示原型。
 5. 替换广告单元 id。
 6. 验证激励视频关闭行为：只有完整观看才发放提示、加时或复活。
 7. 先检查 `readiness.rewardedAdReady` 与 `readiness.interstitialAdReady`，缺广告位时只允许作为无广告试玩包。
@@ -54,5 +54,5 @@ npm run audit:wechat
 ## 主要风险
 
 - 真实变现依赖微信开发者账号、流量主开通、广告位审批和平台审核。
-- DOM 原型不能直接作为生产小游戏包，后续需要迁移到 Canvas/小游戏兼容运行时。
+- DOM 原型不能直接作为生产小游戏包；现在已有无 DOM 的 Canvas 壳，但仍需要在微信开发者工具里接入入口文件、AppID、类目和真实审核配置。
 - 如果没有初始流量，广告分成可能很低；第一版的核心指标应先看完局率、复玩率、分享率和激励触发率。

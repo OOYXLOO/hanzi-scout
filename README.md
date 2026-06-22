@@ -4,6 +4,8 @@ Hanzi Scout is a lightweight glyph-spotting puzzle prototype for short mobile se
 
 ## Current Build
 
+Public app: https://ooyxloo.github.io/hanzi-scout/
+
 - Deterministic daily seed.
 - Six 6x6 rounds, each with one visually different glyph.
 - 60-second timer, speed score, miss penalty, and streak bonus.
@@ -17,6 +19,8 @@ Hanzi Scout is a lightweight glyph-spotting puzzle prototype for short mobile se
 - WeChat mode only grants rewarded assists after a real rewarded-video completion event.
 - `src/canvas-shell.js` provides a DOM-free Canvas/touch shell for the mini game entry.
 - The repository does not include real AppID values, ad unit ids, account data, or owner-only platform console settings.
+
+See `docs/public-verification.md` for the current public deployment, source, and check status.
 
 ## Local Preview
 

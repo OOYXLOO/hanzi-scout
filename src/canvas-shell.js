@@ -124,6 +124,16 @@ export function createCanvasGameShell({
       layout = createCanvasLayout({ width, height, roundSize: getCurrentRound(state)?.size || 6 });
       return layout;
     },
+    loadDay(dayKey = getDayKey()) {
+      state = createGameState({ dayKey, now });
+      shell.state = state;
+      recordedRunKey = null;
+      interstitialRunKey = null;
+      status = "Daily glyph challenge.";
+      layout = createCanvasLayout({ width, height, roundSize: getCurrentRound(state)?.size || 6 });
+      drawCanvasFrame(context, state, { layout, status, profile });
+      return createRunSummary(state);
+    },
     start() {
       startRun(state);
       recordedRunKey = null;

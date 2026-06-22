@@ -15,10 +15,18 @@ assert.equal(wxApi.canvas.width, 780);
 assert.equal(wxApi.canvas.height, 1688);
 assert.equal(wxApi.context.scaleCalls.length, 1);
 assert.equal(wxApi.touchHandlers.size, 1);
+assert.equal(wxApi.showHandlers.size, 1);
 assert.equal(wxApi.requestedFrames.length, 1);
 assert.equal(app.shell.state.run.dayKey, "2026-06-18");
 assert.equal(normalizeLaunchDayKey("2026-06-19"), "2026-06-19");
 assert.equal(normalizeLaunchDayKey("bad-day"), "");
+
+await wxApi.emitShow({ query: { day: "not-a-day" } });
+assert.equal(app.shell.state.run.dayKey, "2026-06-18");
+
+await wxApi.emitShow({ query: { day: "2026-06-19" } });
+assert.equal(app.shell.state.run.dayKey, "2026-06-19");
+assert.equal(app.shell.state.startedAt, null);
 
 const startButton = app.shell.layout.buttons[0];
 await app.handleTouchEvent({
@@ -33,6 +41,7 @@ assert.equal(app.shell.state.solved.length, 1);
 
 app.destroy();
 assert.equal(wxApi.touchHandlers.size, 0);
+assert.equal(wxApi.showHandlers.size, 0);
 
 const entrySource = await readFile(new URL("../game.js", import.meta.url), "utf8");
 const privateEntryPattern = new RegExp([
@@ -80,6 +89,7 @@ function createFakePlatform() {
 function createFakeWxApi() {
   const context = createFakeContext();
   const touchHandlers = new Set();
+  const showHandlers = new Set();
   const requestedFrames = [];
   const wxApi = {
     canvas: {
@@ -91,6 +101,7 @@ function createFakeWxApi() {
     },
     context,
     touchHandlers,
+    showHandlers,
     requestedFrames,
     createCanvas() {
       return this.canvas;
@@ -115,6 +126,12 @@ function createFakeWxApi() {
     offTouchStart(handler) {
       touchHandlers.delete(handler);
     },
+    onShow(handler) {
+      showHandlers.add(handler);
+    },
+    offShow(handler) {
+      showHandlers.delete(handler);
+    },
     requestAnimationFrame(callback) {
       requestedFrames.push(callback);
       return requestedFrames.length;
@@ -123,6 +140,9 @@ function createFakeWxApi() {
     async emitTouch(x, y) {
       const event = { touches: [{ clientX: x, clientY: y }] };
       await Promise.all([...touchHandlers].map((handler) => handler(event)));
+    },
+    async emitShow(event) {
+      await Promise.all([...showHandlers].map((handler) => handler(event)));
     },
   };
   return wxApi;

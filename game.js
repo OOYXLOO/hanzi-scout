@@ -57,7 +57,16 @@ export function createWeChatMiniGameApp({
     return shell.handleTouch(point);
   }
 
+  function handleShowEvent(event) {
+    const dayKey = normalizeLaunchDayKey(event?.query?.day);
+    if (!dayKey || dayKey === shell.state.run.dayKey) {
+      return null;
+    }
+    return shell.loadDay(dayKey);
+  }
+
   const unbindTouch = bindTouchStart(wxApi, handleTouchEvent);
+  const unbindShow = bindShow(wxApi, handleShowEvent);
   start();
 
   return {
@@ -67,9 +76,11 @@ export function createWeChatMiniGameApp({
     start,
     stop,
     handleTouchEvent,
+    handleShowEvent,
     destroy() {
       stop();
       unbindTouch();
+      unbindShow();
     },
   };
 }
@@ -121,6 +132,14 @@ function bindTouchStart(wxApi, handler) {
   wxApi.onTouchStart(handler);
   return () => {
     wxApi.offTouchStart?.(handler);
+  };
+}
+
+function bindShow(wxApi, handler) {
+  if (!wxApi?.onShow) return () => {};
+  wxApi.onShow(handler);
+  return () => {
+    wxApi.offShow?.(handler);
   };
 }
 

@@ -1,6 +1,6 @@
 import { createCanvasGameShell } from "./src/canvas-shell.js";
 import { createGameState } from "./src/game.js";
-import { getDayKey } from "./src/levels.js";
+import { getDayKey, normalizeDayKey } from "./src/levels.js";
 import { createPlatformAdapter } from "./src/wechat-adapter.js";
 
 export function createWeChatMiniGameApp({
@@ -86,8 +86,7 @@ export function createWeChatMiniGameApp({
 }
 
 export function normalizeLaunchDayKey(value) {
-  const text = String(value || "").trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
+  return normalizeDayKey(value);
 }
 
 function readLaunchOptions(wxApi) {

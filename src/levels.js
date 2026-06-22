@@ -40,6 +40,11 @@ export function getDayKey(date = new Date()) {
   return date.toISOString().slice(0, 10);
 }
 
+export function normalizeDayKey(value) {
+  const text = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
+}
+
 export function createRound({ dayKey = getDayKey(), index = 0, size = 6 } = {}) {
   const random = createRandom(`${dayKey}:${index}:hanzi-scout`);
   const pair = pick(random, GLYPH_PAIRS);

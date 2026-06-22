@@ -193,7 +193,7 @@ export function createShareText(state) {
   return `Hanzi Scout ${summary.dayKey}：${status} ${summary.solved}/${summary.total}，${summary.score} 分，最高连击 x${summary.bestCombo}${goal}。`;
 }
 
-export function createSharePayload(state, { source = "share" } = {}) {
+export function createSharePayload(state, { source = "share", baseUrl = "" } = {}) {
   const summary = createRunSummary(state);
   const text = createShareText(state);
   const query = [
@@ -204,12 +204,27 @@ export function createSharePayload(state, { source = "share" } = {}) {
   ]
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join("&");
+  const url = createShareUrl(baseUrl, query);
 
   return {
     title: text,
-    text,
+    text: url ? `${text} ${url}` : text,
     query,
+    url,
   };
+}
+
+export function createShareUrl(baseUrl, query) {
+  if (!baseUrl) return "";
+  try {
+    const url = new URL(String(baseUrl));
+    for (const [key, value] of new URLSearchParams(query)) {
+      url.searchParams.set(key, value);
+    }
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
 export function createProgress(state) {

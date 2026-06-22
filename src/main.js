@@ -1,5 +1,5 @@
 import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createSharePayload, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "./game.js";
-import { getDayKey } from "./levels.js";
+import { getDayKey, normalizeDayKey } from "./levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "./profile.js";
 import { createPlatformAdapter } from "./wechat-adapter.js";
 
@@ -29,7 +29,7 @@ const refs = {
 };
 
 const platform = createPlatformAdapter();
-const state = createGameState({ dayKey: getDayKey() });
+const state = createGameState({ dayKey: readDayKeyFromLocation() || getDayKey() });
 let profile = loadProfile({ storage: platform.storage });
 let timer = null;
 let recordedRunKey = null;
@@ -118,7 +118,7 @@ refs.revive.addEventListener("click", async () => {
 });
 
 refs.share.addEventListener("click", async () => {
-  const payload = createSharePayload(state, { source: "browser-share" });
+  const payload = createSharePayload(state, { source: "browser-share", baseUrl: createShareBaseUrl() });
   refs.shareText.value = payload.text;
   if (!platform.share(payload) && navigator.clipboard) {
     await navigator.clipboard.writeText(payload.text);
@@ -244,6 +244,25 @@ function hintMatches(index, round) {
   const targetUpper = state.hint.quadrant.includes("upper");
   const targetLeft = state.hint.quadrant.includes("left");
   return (targetUpper ? row < round.size / 2 : row >= round.size / 2) && (targetLeft ? col < round.size / 2 : col >= round.size / 2);
+}
+
+function readDayKeyFromLocation(locationObject = globalThis.location) {
+  try {
+    return normalizeDayKey(new URLSearchParams(locationObject?.search || "").get("day"));
+  } catch {
+    return "";
+  }
+}
+
+function createShareBaseUrl(locationObject = globalThis.location) {
+  try {
+    const url = new URL(locationObject?.href || "");
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
 function renderProgress() {

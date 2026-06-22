@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { canOfferRevive, canUseReward, createGameState, createProgress, createRunSummary, createSharePayload, createShareText, finishRun, getCurrentRound, getRemainingSeconds, grantExtraTime, grantHint, grantRevive, pauseForRevive, startRun, tapCell } from "../src/game.js";
-import { createDailyGoal, createRound, createRun, quadrantForIndex } from "../src/levels.js";
+import { createDailyGoal, createRound, createRun, normalizeDayKey, quadrantForIndex } from "../src/levels.js";
 import { createFriendLeaderboard, createScoreCard, loadProfile, recordRun, saveProfile } from "../src/profile.js";
 import { createPlatformAdapter } from "../src/wechat-adapter.js";
 
@@ -35,6 +35,12 @@ const sharePayload = createSharePayload(state, { source: "test-share" });
 assert.match(sharePayload.title, /Hanzi Scout 2026-06-21/);
 assert.match(sharePayload.query, /day=2026-06-21/);
 assert.match(sharePayload.query, /from=test-share/);
+const browserSharePayload = createSharePayload(state, { source: "browser-share", baseUrl: "https://example.test/hanzi-scout/" });
+assert.match(browserSharePayload.url, /day=2026-06-21/);
+assert.match(browserSharePayload.url, /from=browser-share/);
+assert.match(browserSharePayload.text, /https:\/\/example\.test\/hanzi-scout\//);
+assert.equal(normalizeDayKey("2026-06-21"), "2026-06-21");
+assert.equal(normalizeDayKey("bad-day"), "");
 
 time += 15_000;
 const remainingBefore = getRemainingSeconds(state);

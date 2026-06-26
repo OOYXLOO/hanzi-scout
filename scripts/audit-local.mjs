@@ -21,11 +21,14 @@ const required = [
   "tests/wechatEntry.test.mjs",
   "tests/wechatPackageAudit.test.mjs",
   "tests/exportPublisherHandoffCli.test.mjs",
+  "tests/exportMonetizationReadinessCli.test.mjs",
   "docs/wechat-port-plan.md",
   "docs/wechat-package-preflight.md",
   "docs/publisher-handoff.md",
+  "docs/monetization-readiness.md",
   "scripts/audit-wechat-package.mjs",
   "scripts/export-publisher-handoff.mjs",
+  "scripts/export-monetization-readiness.mjs",
 ];
 const forbidden = [
   new RegExp(["money", "goal"].join("-"), "i"),
@@ -107,6 +110,17 @@ for (const marker of [
   "Release Evidence",
 ]) {
   if (!publisherHandoff.includes(marker)) failures.push(`publisher handoff missing ${marker}`);
+}
+
+const monetizationReadiness = await readFile(join(root, "docs/monetization-readiness.md"), "utf8");
+for (const marker of [
+  "Hanzi Scout Monetization Readiness Pack",
+  "Ad Touchpoint Matrix",
+  "Retention & Share Loop",
+  "Responsible Reward Pacing",
+  "Owner-Side Evidence Checklist",
+]) {
+  if (!monetizationReadiness.includes(marker)) failures.push(`monetization readiness missing ${marker}`);
 }
 
 const canvasShell = await readFile(join(root, "src/canvas-shell.js"), "utf8");

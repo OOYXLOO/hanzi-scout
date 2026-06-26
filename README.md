@@ -49,6 +49,7 @@ The native mini game entry is already present:
 - `project.config.example.json`: safe DevTools import template with `appid` set to `touristappid`.
 - `docs/wechat-devtools-import.md`: owner-side import checklist.
 - `docs/wechat-package-preflight.md`: migration boundary and package plan.
+- `docs/monetization-readiness.md`: ad touchpoint, replay-loop, and owner-side evidence checklist for a release candidate.
 
 Do not commit a real `project.config.json`, `project.private.config.json`, or `ad-unit.config.js`. Those files may contain owner-only AppID, DevTools settings, or real ad unit ids and are intentionally ignored.
 

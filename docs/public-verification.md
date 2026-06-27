@@ -1,17 +1,18 @@
 # Public Verification
 
-Last checked: 2026-06-22
+Last checked: 2026-06-27
 
 ## Public Links
 
 - Source: https://github.com/OOYXLOO/hanzi-scout
-- GitHub Pages: https://ooyxloo.github.io/hanzi-scout/
+- Vercel production: https://hanzi-scout.vercel.app/
+- GitHub Pages backup: https://ooyxloo.github.io/hanzi-scout/
 
 ## Verified Source Baseline
 
 - Branch: `master`
-- Baseline commit before this verification note: `91af77e52e520b468476258fa040fda213e05c75`
-- Baseline commit message: `Add Pages deployment workflow`
+- Baseline commit before this verification note: `70733f0`
+- Baseline commit message: `Add monetization readiness export`
 
 The latest repository head is intentionally left to GitHub's commit history so this document does not become stale after documentation-only commits.
 
@@ -21,6 +22,13 @@ The latest repository head is intentionally left to GitHub's commit history so t
 - `npm test`
 - `npm run audit:local`
 - `npm run audit:wechat`
+
+## Deployment Notes
+
+- Vercel production deployment completed on 2026-06-27.
+- Vercel deployment id: `dpl_8PQRycvh3uCXUgMJqLp2Wr1D7Cqe`.
+- Vercel inspector: https://vercel.com/c4ppp/hanzi-scout/8PQRycvh3uCXUgMJqLp2Wr1D7Cqe
+- Vercel CLI created the project and deployed successfully, but automatic GitHub linking still requires adding a GitHub login connection inside Vercel.
 
 ## Notes
 

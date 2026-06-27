@@ -4,7 +4,8 @@ Hanzi Scout is a lightweight glyph-spotting puzzle prototype for short mobile se
 
 ## Current Build
 
-Public app: https://ooyxloo.github.io/hanzi-scout/
+Public app: https://hanzi-scout.vercel.app/
+Backup public app: https://ooyxloo.github.io/hanzi-scout/
 
 - Deterministic daily seed.
 - Six 6x6 rounds, each with one visually different glyph.
